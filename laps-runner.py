@@ -54,11 +54,9 @@ class LapsRunner():
 	cfgLength           = 15 # the generated password length
 	cfgAlphabet         = string.ascii_letters+string.digits+string.punctuation # allowed chars for the new password
 
-	cfgUseNativeLapsAttributeSchema = True
 	cfgSecurityDescriptor           = None
 	cfgHistorySize                  = 0 # disabled by default because encryption is disabled by default
 	cfgLdapAttributePassword        = 'msLAPS-Password'
-	cfgLdapAttributePasswordHistory = 'msLAPS-EncryptedPasswordHistory'
 	cfgLdapAttributePasswordExpiry  = 'msLAPS-PasswordExpirationTime'
 
 	tmpDn         = ''
@@ -74,6 +72,7 @@ class LapsRunner():
 
 		# show note
 		print(self.PRODUCT_NAME+' v'+self.PRODUCT_VERSION)
+		print('This script has been modified for a specific use case, the original work can be found here: ('+self.PRODUCT_WEBSITE+').')
 		print('If you like LAPS4LINUX please do not forget to give the repository a star ('+self.PRODUCT_WEBSITE+').')
 		print('')
 
@@ -171,20 +170,6 @@ class LapsRunner():
 		# check if dn of target computer object is known
 		if self.tmpDn.strip() == '': return
 
-		# apply Native LAPS JSON format
-		if(self.cfgUseNativeLapsAttributeSchema):
-			print('Using Native LAPS JSON format')
-			newPassword = json.dumps({
-				'p': newPassword,
-				'n': self.cfgUsername,
-				't': ('%0.2X' % dt_to_filetime(datetime.now())).lower()
-			})
-
-		# encrypt Native LAPS content
-		if(self.cfgUseNativeLapsAttributeSchema and self.cfgSecurityDescriptor):
-			print('Encrypting password to SID', self.cfgSecurityDescriptor)
-			newPassword = self.encryptPassword(newPassword)
-
 		# start query
 		self.connection.modify(self.tmpDn, {
 			self.cfgLdapAttributePasswordExpiry: [(ldap3.MODIFY_REPLACE, [str( dt_to_filetime(newExpirationDate) )])],
@@ -225,33 +210,6 @@ class LapsRunner():
 						raise Exception('Could not remove old password from history in LDAP directory: '+str(self.connection.result))
 				break
 
-	def encryptPassword(self, content):
-		import dpapi_ng
-		encrypted = None
-		for server in self.server.servers:
-			try: # one server could be unavailable, simply try the next one
-				encrypted = dpapi_ng.ncrypt_protect_secret(
-					content.encode('utf-16-le')+b"\x00\x00",
-					self.cfgSecurityDescriptor,
-					server = server.host,
-				)
-				break
-			except Exception as e:
-				print('Encryption attempt failed', e)
-		if not encrypted: raise Exception('Unable to encrypt blob')
-
-		# 0-4 - timestamp upper
-		# 4-8 - timestamp lower
-		# 8-12 - blob size, uint32
-		# 12-16 - flags, currently always 0
-		preMagic = (
-			struct.pack('<Q', dt_to_filetime(datetime.now()))
-			+ struct.pack('<i', len(encrypted))
-			+ b'\x00\x00\x00\x00'
-		)
-
-		return preMagic + encrypted
-
 	def generatePassword(self):
 		return ''.join(secrets.choice(self.cfgAlphabet) for i in range(self.cfgLength))
 
@@ -290,7 +248,6 @@ class LapsRunner():
 			self.cfgDaysValid = int(cfgJson.get('password-days-valid', self.cfgDaysValid))
 			self.cfgLength = int(cfgJson.get('password-length', self.cfgLength))
 			self.cfgAlphabet = str(cfgJson.get('password-alphabet', self.cfgAlphabet))
-			self.cfgUseNativeLapsAttributeSchema = bool(cfgJson.get('native-laps', self.cfgUseNativeLapsAttributeSchema))
 			self.cfgSecurityDescriptor = cfgJson.get('security-descriptor', self.cfgSecurityDescriptor)
 			self.cfgHistorySize = cfgJson.get('history-size', self.cfgHistorySize)
 			self.cfgLdapAttributePassword = str(cfgJson.get('ldap-attribute-password', self.cfgLdapAttributePassword))
