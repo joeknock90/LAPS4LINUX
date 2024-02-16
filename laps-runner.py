@@ -40,7 +40,7 @@ class LapsRunner():
 	connection = None
 	logger     = None
 
-	cfgPath             = '/etc/laps-runner.json'
+	cfgPath             = '/etc/laps/laps-runner.json'
 
 	cfgCredCacheFile    = '/tmp/laps.temp'
 	cfgClientKeytabFile = '/etc/krb5.keytab'
