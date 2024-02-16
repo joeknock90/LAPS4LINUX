@@ -34,7 +34,8 @@ def filetime_to_dt(ft): # ft is in UTC, fromtimestamp() converts to local time
 class LapsRunner():
 	PRODUCT_NAME      = 'LAPS4LINUX Runner'
 	PRODUCT_VERSION   = '1.7.2'
-	PRODUCT_WEBSITE   = 'https://github.com/schorschii/laps4linux'
+	PRODUCT_WEBSITE = 'https://github.com/schorschii/laps4linux'
+	ORIGINAL_PRODUCT_WEBSITE   = 'https://github.com/schorschii/laps4linux'
 
 	server     = None
 	connection = None
@@ -75,8 +76,7 @@ class LapsRunner():
 
 		# show note
 		print(self.PRODUCT_NAME+' v'+self.PRODUCT_VERSION)
-		print('This script has been modified for a specific use case, the original work can be found here: ('+self.PRODUCT_WEBSITE+').')
-		print('If you like LAPS4LINUX please do not forget to give the repository a star ('+self.PRODUCT_WEBSITE+').')
+		print('This script has been modified for a specific use case, the original work can be found here: ('+self.ORIGINAL_PRODUCT_WEBSITE+').')
 		print('')
 
 	def getHostname(self):
