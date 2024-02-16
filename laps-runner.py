@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.6
 # -*- coding: utf-8 -*-
 
 from pathlib import Path
@@ -76,7 +76,7 @@ class LapsRunner():
 
 		# show note
 		print(self.PRODUCT_NAME+' v'+self.PRODUCT_VERSION)
-		print('This script has been modified for a specific use case, the original work can be found here: ('+self.ORIGINAL_PRODUCT_WEBSITE+').')
+		#print('This script has been modified for a specific use case, the original work can be found here: ('+self.ORIGINAL_PRODUCT_WEBSITE+').')
 		print('')
 
 	def getHostname(self):
