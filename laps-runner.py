@@ -5,7 +5,6 @@ from pathlib import Path
 from os import path
 from crypt import crypt
 from datetime import datetime, timedelta
-from dns import resolver, rdatatype
 from shutil import which
 import struct
 import ssl
@@ -102,21 +101,9 @@ class LapsRunner():
 
 		# connect to server with kerberos ticket
 		serverArray = []
-		if(len(self.cfgServer) == 0):
-			# query domain controllers by dns lookup
-			searchDomain = '.'+self.cfgDomain if self.cfgDomain!='' else ''
-			res = resolver.resolve(qname=f'_ldap._tcp'+searchDomain, rdtype=rdatatype.SRV, lifetime=10, search=True)
-
-			for srv in res.rrset:
-				if(self.cfgUseStartTls):
-					# strip the trailing . from the dns resolver for certificate verification reasons.
-					serverArray.append(ldap3.Server(host=str(srv.target).rstrip('.'), port=389, tls=tlssettings, get_info=ldap3.ALL))
-				else:
-					serverArray.append(ldap3.Server(host=str(srv.target).rstrip('.'), port=636, use_ssl=True, tls=tlssettings, get_info=ldap3.ALL))
-		else:
-			# use servers given in config file
-			for server in self.cfgServer:
-				serverArray.append(ldap3.Server(server['address'], port=server['port'], use_ssl=server['ssl'], get_info=ldap3.ALL))
+		# use servers given in config file
+		for server in self.cfgServer:
+			serverArray.append(ldap3.Server(server['address'], port=server['port'], use_ssl=server['ssl'], get_info=ldap3.ALL))
 		self.server = ldap3.ServerPool(serverArray, ldap3.ROUND_ROBIN, active=2, exhaust=True)
 		if(self.cfgUseStartTls):
 			self.connection = ldap3.Connection(self.server, version=3, authentication=ldap3.SASL, sasl_mechanism=ldap3.GSSAPI, auto_bind=ldap3.AUTO_BIND_TLS_BEFORE_BIND)
