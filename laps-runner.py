@@ -59,7 +59,6 @@ class LapsRunner():
 	cfgHistorySize                  = 0 # disabled by default because encryption is disabled by default
 	cfgLdapAttributePassword        = 'ms-Mcs-AdmPwd'
 	cfgLdapAttributePasswordExpiry  = 'ms-Mcs-AdmPwdExpirationTime'
-'
 	cfgLdapAttributePasswordHistory = 0
 
 
@@ -77,7 +76,7 @@ class LapsRunner():
 		# show note
 		print(self.PRODUCT_NAME+' v'+self.PRODUCT_VERSION)
 		#print('This script has been modified for a specific use case, the original work can be found here: ('+self.ORIGINAL_PRODUCT_WEBSITE+').')
-		print('')
+		#print('')
 
 	def getHostname(self):
 		if(self.cfgHostname == None or self.cfgHostname.strip() == ''):
