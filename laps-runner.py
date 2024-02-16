@@ -58,6 +58,8 @@ class LapsRunner():
 	cfgHistorySize                  = 0 # disabled by default because encryption is disabled by default
 	cfgLdapAttributePassword        = 'msLAPS-Password'
 	cfgLdapAttributePasswordExpiry  = 'msLAPS-PasswordExpirationTime'
+	cfgLdapAttributePasswordHistory = '0'|
+
 
 	tmpDn         = ''
 	tmpPassword   = None
