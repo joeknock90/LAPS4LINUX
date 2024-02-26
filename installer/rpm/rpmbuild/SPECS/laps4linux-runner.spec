@@ -1,14 +1,14 @@
 Name:           laps4linux-runner
-Version:        1.7.2
+Version:        1
 Release:        1%{?dist}
 Summary:        Laps4linux - auto-rotate the root password for AD bound (samba net, pbis, adcli) linux servers
 BuildArch:      noarch
 
 License:        GPL-3.0
-URL:            https://github.com/schorschii/LAPS4LINUX
+URL:            https://github.com/joeknock90/LAPS4LINUX
 Source0:        %{name}-%{version}.tar.gz
 
-Requires:       python3 python3-pip python3-gssapi python3-cryptography python3-dns python3-devel krb5-workstation krb5-devel gcc
+Requires:       python3 python3-gssapi python3-cryptography python3-dns python3-devel krb5-workstation krb5-devel gcc python3-ldap3
 
 %description
 This RPM contains the script and personalized config to run the lap4linux python script
@@ -27,12 +27,9 @@ rm -rf $RPM_BUILD_ROOT
 mkdir -p $RPM_BUILD_ROOT/%{_sbindir}
 cp usr/sbin/laps-runner $RPM_BUILD_ROOT/%{_sbindir}/laps-runner
 mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}
-cp etc/laps-runner.json $RPM_BUILD_ROOT/%{_sysconfdir}
-mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/cron.hourly/
-cp etc/cron.hourly/laps-runner $RPM_BUILD_ROOT/%{_sysconfdir}/cron.hourly/
+cp etc/laps/laps-runner.json $RPM_BUILD_ROOT/%{_sysconfdir}
 
 %post
-sudo -H pip3 install ldap3 dpapi-ng[kerberos]
 
 
 %clean
@@ -42,13 +39,12 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %{_sbindir}/laps-runner
 %{_sysconfdir}/laps-runner.json
-%{_sysconfdir}/cron.hourly/laps-runner
 
 
 %changelog
-* Wed Jan 04 2023 schorschii
-- Renamed packages to laps4linux-client and laps4linux-runner
-- Adjusted dependencies for CentOS 9
-
-* Thu Jan 13 2022 novaksam
-- Initial build
+* Mon Feb 26 2024 Joe Knockenhauer <joseph.knockenhauer@noaa.gov>
+- Initial package forked from https://github.com/schorschii/LAPS4LINUX
+- Package was created for use by NWSER only
+- Make for LAPSv1 only
+- Removed pip dependecies in favor of creating python3 packages required for install
+- Preapre for adding to Satellite as it's own package
